@@ -147,30 +147,39 @@ function showToast(msg, type = 'success') {
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// ===== DATE UTILS =====
+// ===== DATE UTILS (المسخة المصححة) =====
+
 function today() { 
+  // الطريقة الأضمن للحصول على تاريخ اليوم بتنسيق YYYY-MM-DD بدون مشاكل المنطقة الزمنية
   const d = new Date();
-  const offset = d.getTimezoneOffset();
-  const localDate = new Date(d.getTime() - offset * 60000);
-  return localDate.toISOString().split('T')[0]; 
+  return d.getFullYear() + '-' + 
+         String(d.getMonth() + 1).padStart(2, '0') + '-' + 
+         String(d.getDate()).padStart(2, '0');
 }
+
 function formatDate(d) {
   if (!d) return '';
   const [year, month, day] = d.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' });
+  // إضافة 'u-ca-gregory' تضمن أن يظهر التقويم ميلادي حتى لو كان جهاز المستخدم مضبوطاً على الهجري
+  return date.toLocaleDateString('ar-SA-u-ca-gregory', { year: 'numeric', month: 'short', day: 'numeric' });
 }
+
 function monthName(date) {
-  const d = new Date(date.getFullYear(), date.getMonth(), 1);
-  return d.toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' });
+  // إجبار النظام على استخدام التقويم الميلادي العربي
+  return date.toLocaleDateString('ar-SA-u-ca-gregory', { month: 'long', year: 'numeric' });
 }
+
 function daysBetween(a, b) {
-  const [ay, am, ad] = a.split('-').map(Number);
-  const [by, bm, bd] = b.split('-').map(Number);
-  const dateA = new Date(ay, am - 1, ad);
-  const dateB = new Date(by, bm - 1, bd);
-  return Math.ceil((dateB - dateA) / 86400000);
+  const dateA = new Date(a);
+  const dateB = new Date(b);
+  // تصفير الوقت لضمان حساب الأيام بدقة 100%
+  dateA.setHours(0, 0, 0, 0);
+  dateB.setHours(0, 0, 0, 0);
+  const diffTime = dateB - dateA;
+  return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
+
 
 // ===== HOME PAGE =====
 async function renderHome() {
