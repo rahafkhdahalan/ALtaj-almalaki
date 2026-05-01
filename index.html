@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0B1C2C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="التاج الملكي">
+  <meta name="description" content="نظام إدارة محل تأجير بدل رجالية">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <title>التاج الملكي للأزياء</title>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="header-crown">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 19L4 9L8 13L12 4L16 13L20 9L22 19H2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 19V21M18 19V21M12 19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="4" r="1.5" fill="currentColor"/>
+          <circle cx="4" cy="9" r="1.5" fill="currentColor"/>
+          <circle cx="20" cy="9" r="1.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <div>
+        <div class="header-title">التاج الملكي للأزياء</div>
+        <div class="header-subtitle">نظام إدارة البدلات الملكي</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="navigateTo('search')" title="بحث">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="icon-btn gold" onclick="openAddReservation()" title="حجز جديد">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== PAGES ===== -->
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card available">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="stat-number" id="stat-available">0</div>
+        <div class="stat-label">بدلات متاحة</div>
+      </div>
+      <div class="stat-card reserved">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M12 11v4"/><path d="M8 11v4"/><path d="M16 11v4"/></svg>
+        </div>
+        <div class="stat-number" id="stat-reserved">0</div>
+        <div class="stat-label">بدلات محجوزة</div>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alerts-section" id="alerts-container"></div>
+
+    <!-- Upcoming -->
+    <div class="section-header">
+      <div class="section-title">الحجوزات القادمة</div>
+      <button class="btn btn-ghost btn-sm" onclick="navigateTo('reservations')">عرض الكل</button>
+    </div>
+    <div id="upcoming-list" class="upcoming-list"></div>
+
+    <!-- Quick Add -->
+    <div style="margin-top:24px">
+      <div class="gold-divider"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-gold btn-full" onclick="openAddReservation()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          إضافة حجز جديد
+        </button>
+        <button class="btn btn-ghost btn-full" onclick="openAddSuit()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+          إضافة بدلة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUITS -->
+  <div id="page-suits" class="page">
+    <div class="section-header">
+      <div class="section-title">إدارة البدلات</div>
+      <button class="btn btn-gold btn-sm" onclick="openAddSuit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        إضافة
+      </button>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="suit-search-input" placeholder="ابحث عن بدلة...">
+    </div>
+    <div class="filter-chips" id="suits-filter">
+      <div class="chip active" data-filter="all">الكل</div>
+      <div class="chip" data-filter="available">متاحة</div>
+      <div class="chip" data-filter="reserved">محجوزة</div>
+    </div>
+    <div class="suits-grid" id="suits-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+        </div>
+        <div class="empty-text">لا توجد بدلات بعد</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESERVATIONS -->
+  <div id="page-reservations" class="page">
+    <div class="section-header">
+      <div class="section-title">الحجوزات</div>
+      <button class="btn btn-gold btn-sm" onclick="openAddReservation()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        إضافة
+      </button>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="res-search-input" placeholder="ابحث عن زبون...">
+    </div>
+    <div class="filter-chips" id="res-filter">
+      <div class="chip active" data-filter="all">الكل</div>
+      <div class="chip" data-filter="active">نشطة</div>
+      <div class="chip" data-filter="ended">منتهية</div>
+    </div>
+    <div id="reservations-list">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="empty-text">لا توجد حجوزات بعد</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="page-calendar" class="page">
+    <div class="section-title" style="margin-bottom:16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:8px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      التقويم
+    </div>
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <button class="cal-nav" onclick="prevMonth()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="calendar-month-title" id="cal-month-label">--</div>
+        <button class="cal-nav" onclick="nextMonth()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="calendar-weekdays">
+        <div class="weekday-label">أح</div>
+        <div class="weekday-label">اث</div>
+        <div class="weekday-label">ثل</div>
+        <div class="weekday-label">أر</div>
+        <div class="weekday-label">خم</div>
+        <div class="weekday-label">جم</div>
+        <div class="weekday-label">سب</div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+    <div class="glass-card" style="margin-top:8px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:16px;font-size:11px">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:rgba(212,175,55,0.25);border-radius:2px"></div> حجز نشط</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:rgba(231,76,60,0.25);border-radius:2px"></div> إرجاع</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--navy);font-weight:700">اليوم</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="page-stats" class="page">
+    <div class="section-title" style="margin-bottom:16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:8px"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      الإحصائيات
+    </div>
+    <div class="stats-dashboard">
+
+      <div class="glass-card">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:16px">البدلات</div>
+        <div class="chart-container" style="padding:0">
+          <div class="pie-chart-wrapper">
+            <svg id="pie-svg" viewBox="0 0 180 180"></svg>
+          </div>
+          <div class="pie-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> متاحة</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> محجوزة</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:0">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+          </div>
+          <div class="stat-number" id="stats-total">0</div>
+          <div class="stat-label">إجمالي البدلات</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="stat-number" id="stats-res-total">0</div>
+          <div class="stat-label">إجمالي الحجوزات</div>
+        </div>
+        <div class="stat-card available">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div class="stat-number" id="stats-available">0</div>
+          <div class="stat-label">متاحة</div>
+        </div>
+        <div class="stat-card reserved">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M12 11v4"/><path d="M8 11v4"/><path d="M16 11v4"/></svg>
+          </div>
+          <div class="stat-number" id="stats-reserved">0</div>
+          <div class="stat-label">محجوزة</div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px">الحجوزات الحالية</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:36px;font-weight:900;color:var(--gold)" id="stats-res-active">0</div>
+          <div style="font-size:13px;color:var(--white-50)">حجز نشط حالياً</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="page-search" class="page">
+    <div class="section-title" style="margin-bottom:16px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:8px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      البحث
+    </div>
+    <div class="search-bar" style="margin-bottom:16px">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="global-search" placeholder="ابحث عن بدلة أو زبون...">
+    </div>
+    <div id="search-results">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <div class="empty-text">ابدأ الكتابة للبحث</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="nav-label">الرئيسية</div>
+    </button>
+    <button class="nav-item" data-page="suits">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+      </div>
+      <div class="nav-label">البدلات</div>
+    </button>
+    <button class="nav-item" data-page="reservations">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="nav-label">الحجوزات</div>
+    </button>
+    <button class="nav-item" data-page="calendar">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="nav-label">التقويم</div>
+    </button>
+    <button class="nav-item" data-page="stats">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      </div>
+      <div class="nav-label">الإحصائيات</div>
+    </button>
+  </nav>
+
+</div><!-- #app -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- ADD/EDIT SUIT MODAL -->
+<div class="modal-overlay" id="modal-suit" onclick="if(event.target===this)closeModal('modal-suit')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-suit-title">إضافة بدلة جديدة</div>
+      <button class="modal-close" onclick="closeModal('modal-suit')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="suit-form" onsubmit="event.preventDefault();saveSuit()">
+
+        <!-- Image upload -->
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            صورة البدلة
+          </label>
+          <div class="img-upload-area" onclick="document.getElementById('suit-img-input').click()">
+            <input type="file" id="suit-img-input" accept="image/*" onchange="handleImageUpload(this)" style="display:none">
+            <img id="img-preview" class="img-upload-preview" style="display:none" alt="">
+            <div id="upload-placeholder" style="display:flex;flex-direction:column;align-items:center">
+              <div class="img-upload-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="img-upload-text">اضغط لرفع صورة</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">رقم البدلة *</label>
+            <input type="text" id="suit-id" class="form-control" placeholder="مثال: S001" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم البدلة *</label>
+            <input type="text" id="suit-name" class="form-control" placeholder="مثال: بدلة كلاسيك" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">اللون *</label>
+            <input type="text" id="suit-color" class="form-control" placeholder="مثال: أسود" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المقاس *</label>
+            <input type="text" id="suit-size" class="form-control" placeholder="مثال: XL أو 52" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-full" style="margin-top:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          حفظ البدلة
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT RESERVATION MODAL -->
+<div class="modal-overlay" id="modal-reservation" onclick="if(event.target===this)closeModal('modal-reservation')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-res-title">إضافة حجز جديد</div>
+      <button class="modal-close" onclick="closeModal('modal-reservation')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="res-form" onsubmit="event.preventDefault();saveReservation()">
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+            اختر البدلة *
+          </label>
+          <select id="res-suit" class="form-control" required>
+            <option value="">-- اختر بدلة --</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              اسم الزبون *
+            </label>
+            <input type="text" id="res-customer" class="form-control" placeholder="الاسم الكامل" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              رقم الجوال *
+            </label>
+            <input type="tel" id="res-phone" class="form-control" placeholder="05xxxxxxxx" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              تاريخ الاستلام *
+            </label>
+            <input type="date" id="res-start" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+              تاريخ الإرجاع *
+            </label>
+            <input type="date" id="res-end" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            ملاحظات
+          </label>
+          <textarea id="res-notes" class="form-control" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-full">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          حفظ الحجز
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="modal-day-detail" onclick="if(event.target===this)closeModal('modal-day-detail')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="day-detail-date">تفاصيل اليوم</div>
+      <button class="modal-close" onclick="closeModal('modal-day-detail')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="day-detail-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="./app.js"></script>
+</body>
+</html>
