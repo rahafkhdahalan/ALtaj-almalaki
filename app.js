@@ -148,17 +148,28 @@ function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ===== DATE UTILS =====
-function today() { return new Date().toISOString().split('T')[0]; }
+function today() { 
+  const d = new Date();
+  const offset = d.getTimezoneOffset();
+  const localDate = new Date(d.getTime() - offset * 60000);
+  return localDate.toISOString().split('T')[0]; 
+}
 function formatDate(d) {
   if (!d) return '';
-  const date = new Date(d + 'T00:00:00');
+  const [year, month, day] = d.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
   return date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 function monthName(date) {
-  return date.toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' });
+  const d = new Date(date.getFullYear(), date.getMonth(), 1);
+  return d.toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' });
 }
 function daysBetween(a, b) {
-  return Math.ceil((new Date(b) - new Date(a)) / 86400000);
+  const [ay, am, ad] = a.split('-').map(Number);
+  const [by, bm, bd] = b.split('-').map(Number);
+  const dateA = new Date(ay, am - 1, ad);
+  const dateB = new Date(by, bm - 1, bd);
+  return Math.ceil((dateB - dateA) / 86400000);
 }
 
 // ===== HOME PAGE =====
@@ -221,8 +232,9 @@ async function renderHome() {
   } else {
     upcomingEl.innerHTML = upcomingAll.map(r => {
       const suit = suits.find(s => s.id === r.suitId);
-      const d = new Date(r.startDate + 'T00:00:00');
-      const day = d.getDate();
+      const [y, m, dayNum] = r.startDate.split('-').map(Number);
+      const d = new Date(y, m - 1, dayNum);
+      const day = dayNum;
       const month = d.toLocaleDateString('ar-SA', { month: 'short' });
       return `<div class="reservation-mini-card">
         <div class="res-date-badge">
@@ -394,35 +406,59 @@ async function renderReservations() {
   container.innerHTML = reservations.map(r => {
     const suit = suits.find(s => s.id === r.suitId);
     const isLate = r.status === 'active' && r.endDate < todayStr;
+    const statusText = r.status === 'active' ? 'نشط' : 'منتهي';
+    const statusClass = r.status === 'active' ? 'reserved' : 'available';
+
     return `<div class="reservation-card">
       <div class="reservation-card-header">
         <div>
-          <div class="customer-name">${r.customerName} ${isLate ? ICONS.warning : ''}</div>
-          <div class="customer-phone">${ICONS.phone} ${r.customerPhone}</div>
+          <div class="customer-name">
+            ${r.customerName}
+            ${isLate ? `<span style="color:var(--red)">${ICONS.warning}</span>` : ''}
+          </div>
+          <div class="customer-phone">
+            ${ICONS.phone}
+            <span>${r.customerPhone}</span>
+          </div>
         </div>
-        <span class="suit-status-badge ${r.status === 'active' ? 'reserved' : 'available'}" style="position:static">
-          ${r.status === 'active' ? 'نشط' : 'منتهي'}
+        <span class="suit-status-badge ${statusClass}">
+          ${statusText}
         </span>
       </div>
+
       <div class="reservation-details">
         <div class="detail-item">
           <div class="detail-label">البدلة</div>
-          <div class="detail-value">${ICONS.suit} ${suit ? suit.name : r.suitId}</div>
+          <div class="detail-value">
+            ${ICONS.suit}
+            <span>${suit ? suit.name : r.suitId}</span>
+          </div>
         </div>
         <div class="detail-item">
           <div class="detail-label">تاريخ الاستلام</div>
-          <div class="detail-value">${ICONS.dateStart} ${formatDate(r.startDate)}</div>
+          <div class="detail-value">
+            ${ICONS.dateStart}
+            <span>${formatDate(r.startDate)}</span>
+          </div>
         </div>
         <div class="detail-item">
           <div class="detail-label">تاريخ الإرجاع</div>
-          <div class="detail-value ${isLate ? 'color:var(--red)' : ''}">${ICONS.dateEnd} ${formatDate(r.endDate)}</div>
+          <div class="detail-value" style="${isLate ? 'color:var(--red)' : ''}">
+            ${ICONS.dateEnd}
+            <span>${formatDate(r.endDate)}</span>
+          </div>
         </div>
         <div class="detail-item">
           <div class="detail-label">المدة</div>
-          <div class="detail-value">${ICONS.clock} ${daysBetween(r.startDate, r.endDate)} أيام</div>
+          <div class="detail-value">
+            ${ICONS.clock}
+            <span>${daysBetween(r.startDate, r.endDate)} أيام</span>
+          </div>
         </div>
       </div>
-      ${r.notes ? `<div class="reservation-notes">${ICONS.note} ${r.notes}</div>` : ''}
+
+      ${r.notes ? `<div class="reservation-notes">${ICONS.note} <span>${r.notes}</span></div>` : ''}
+
       <div class="reservation-actions">
         ${r.status === 'active' ? `
           <button class="btn btn-success btn-sm" onclick="endReservation(${r.id})">${ICONS.check} إنهاء</button>
@@ -613,7 +649,10 @@ async function renderCalendar() {
 
   const grid = document.getElementById('calendar-grid');
   grid.innerHTML = days.map(({ date, otherMonth }) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     const isToday = dateStr === todayStr;
 
     const dayReservations = reservations.filter(r =>
@@ -638,9 +677,10 @@ async function showDayDetail(dateStr) {
   const reservations = await dbGet('reservations');
   const suits = await dbGet('suits');
 
-  const active = reservations.filter(r =>
-    r.status === 'active' && r.startDate <= dateStr && r.endDate > dateStr
-  );
+  const active = reservations.filter(r => {
+    if (r.status !== 'active') return false;
+    return r.startDate <= dateStr && r.endDate > dateStr;
+  });
   const returns = reservations.filter(r => r.status === 'active' && r.endDate === dateStr);
   const starts = reservations.filter(r => r.startDate === dateStr);
 
